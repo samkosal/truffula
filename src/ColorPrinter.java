@@ -87,6 +87,37 @@ public class ColorPrinter {
    */
   public void print(String message, boolean reset) {
     // TODO: Implement this!
+    // System.out.println(currentColor.getCode().replace("\033", "\\033"));
+
+    // if (reset == true) {
+    //   setCurrentColor(ConsoleColor.RESET);
+    // }
+    // printStream.print(currentColor + message);
+    if (reset == true) {
+      printStream.print(currentColor + message + ConsoleColor.RESET);
+    } 
+    else if (reset == false) {
+      printStream.print(currentColor + message);
+    }
+    
+
+  }
+  
+  /**
+   * Main method for testing ColorPrinter functionality.
+   */
+  public static void main(String[] args) {
+    ColorPrinter printer = new ColorPrinter(System.out);
+    printer.setCurrentColor(ConsoleColor.RED);
+    printer.println("This is red text");
+    printer.setCurrentColor(ConsoleColor.GREEN);
+    printer.println("This is green text");
+    printer.setCurrentColor(ConsoleColor.BLUE);
+    printer.println("This is blue text", false);
+    printer.setCurrentColor(ConsoleColor.YELLOW);
+    printer.println("This is yellow text");
+    printer.setCurrentColor(ConsoleColor.RESET);
+    printer.println("This is default color text");
   }
 
   /**

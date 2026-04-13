@@ -102,9 +102,58 @@ public class TruffulaOptions  {
    */
   public TruffulaOptions(String[] args) throws IllegalArgumentException, FileNotFoundException {
     // TODO: Replace the below lines with your implementation
-    root = null;
-    showHidden = false;
-    useColor = false;
+    System.out.println(args[0]);
+    System.out.println(args[1]);
+    System.out.println(args[2]);
+    // root = null;
+    // showHidden = false;
+    // useColor = false;
+
+    File TempRoot = null;
+    boolean TempShowHidden = false;
+    boolean TempUseColor = true;
+
+    // 1. ['-nc', '-h', '/path/to/directory']
+    //  *    → Don't use color, do show hidden files.
+    // Only parse flags, not the last argument (which is the path)
+    for (int i = 0; i < args.length - 1; i++) {
+      String value = args[i];
+      if (value.equals("-nc")) {
+        TempUseColor = false;
+      } else if (value.equals("-h")) {
+        TempShowHidden = true;
+      } else {
+        throw new IllegalArgumentException("Unknown flag: " + value);
+      }
+    }
+
+    File directory = new File(args[args.length - 1]);
+    if (!directory.exists() || !directory.isDirectory()) {
+      throw new FileNotFoundException();
+    } else {
+      TempRoot = directory;
+    }
+
+    root = TempRoot;
+    showHidden = TempShowHidden;
+    useColor = TempUseColor;
+  }
+
+  /**
+   * Main method for testing TruffulaOptions argument parsing.
+   */
+  public static void main(String[] args) {
+    try {
+      args = new String[] {"-nc", "-h", "/path/to/directory"};
+      TruffulaOptions options = new TruffulaOptions(args);
+
+      System.out.println("Parsed options: " + options);
+      System.out.println("Root: " + options.getRoot());
+      System.out.println("Show hidden: " + options.isShowHidden());
+      System.out.println("Use color: " + options.isUseColor());
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
+    }
   }
 
   /**

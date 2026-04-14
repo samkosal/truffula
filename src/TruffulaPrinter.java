@@ -6,8 +6,7 @@ import java.util.List;
  * with optional colored output. It supports sorting files and directories
  * in a case-insensitive manner and cycling through colors for visual clarity.
  */
-public class TruffulaPrinter {
-  
+public class TruffulaPrinter {  
   /**
    * Configuration options that determine how the tree is printed.
    */
@@ -103,16 +102,46 @@ public class TruffulaPrinter {
    *    zebra.txt
    */
   public void printTree() {
-    // TODO: Implement this!
-    // REQUIRED: ONLY use java.io, DO NOT use java.nio
-    
-    // Hints:
-    // - Add a recursive helper method
-    // - For Wave 6: Use AlphabeticalFileSorter
-    // DO NOT USE SYSTEM.OUT.PRINTLN
-    // USE out.println instead (will use your ColorPrinter)
+    printHelper(options.getRoot(), 0);
 
-    out.println("printTree was called!");
-    out.println("My options are: " + options);
+    // TESTING OUT: .getName(), .isDirectory, .listFiles(), java.io.File
+    // System.out.println(options.getRoot());
+    // System.out.println(options.getRoot().isDirectory());
+    // java.io.File[] files = options.getRoot().listFiles();
+    // if (files != null) {
+    //     for (java.io.File file : files) {
+    //         System.out.println(file); // prints the File object's path
+    //     }
+    // }
   }
+
+  private void printHelper(java.io.File root, int level) {
+    
+    String indent = "   ";
+    //Grabs the last part of the path. for Ex: new File("C:/foo/bar.txt"), getName() returns "bar.txt" 
+    String name = root.getName();
+
+   //.isDirectory if and only if the file exists and is a directory.
+   // basically checks if root is a 
+
+   //if root is a directory that exist
+    if (root.isDirectory()) {
+      // print out the root directory in this format:
+      out.println(indent.repeat(level) + name + "/");
+      //.listFiles() returns an array of files inside root, only works on directory, hence why we checked it in the first place.
+      java.io.File[] files = root.listFiles();
+      
+      //if the root directory is NOT empty
+      if (files != null) {
+        //start looping over each file and recursion
+        for (java.io.File file : files) {
+          printHelper(file, level + 1);
+        }
+      }
+    //if root is NOT a directory, meaning this is just a normal, then just print it out with the correct indentation
+    } else {
+      out.println(indent.repeat(level) + name);
+    }
+  }
+
 }

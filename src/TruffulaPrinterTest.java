@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TruffulaPrinterTest {
-
     /**
      * Checks if the current operating system is Windows.
      *
@@ -148,5 +147,48 @@ public class TruffulaPrinterTest {
 
         // Assert that the output matches the expected output exactly
         assertEquals(expected.toString(), output);
+    }
+
+    @Test
+    public void testPrintTree_SimpleDirectory_NoColorNoHidden(@TempDir File tempDir) throws IOException {
+        // Create a simple directory with two files and one subdirectory
+        File root = new File(tempDir, "root");
+        assertTrue(root.mkdir(), "root should be created");
+
+        File fileA = new File(root, "A.txt");
+        File fileB = new File(root, "B.txt");
+        fileA.createNewFile();
+        fileB.createNewFile();
+
+        File subDir = new File(root, "sub");
+        assertTrue(subDir.mkdir(), "sub directory should be created");
+
+        // TruffulaOptions: showHidden = false, useColor = false
+        TruffulaOptions options = new TruffulaOptions(root, false, false);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos);
+        TruffulaPrinter printer = new TruffulaPrinter(options, printStream);
+        printer.printTree();
+
+        String output = baos.toString();
+        String nl = System.lineSeparator();
+
+        // Build expected output (no color, no order enforced)
+        StringBuilder expected = new StringBuilder();
+        expected.append("root/").append(nl);
+        expected.append("   A.txt").append(nl);
+        expected.append("   B.txt").append(nl);
+        expected.append("   sub/").append(nl);
+
+        // Check that all expected lines are present in the output
+        // String[] expectedLines = expected.toString().split(nl);
+        // for (String line : expectedLines) {
+        //     if (!line.isEmpty()) {
+        //         assertTrue(output.contains(line), "Should contain: '" + line + "'");
+        //     }
+        // }
+        String cleanOutput = output.replaceAll("\\u001B\\[[;\\d]*m", "");
+        assertEquals(expected.toString(), cleanOutput);
     }
 }

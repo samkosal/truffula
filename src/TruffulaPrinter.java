@@ -136,6 +136,9 @@ public class TruffulaPrinter {
       if (files != null) {
         //start looping over each file and recursion
         for (java.io.File file : files) {
+          if (file.isHidden() && !options.isShowHidden()) {
+            continue;
+          }
           printHelper(file, level + 1);
         }
       }

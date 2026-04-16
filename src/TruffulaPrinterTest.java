@@ -1,3 +1,4 @@
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -181,14 +182,154 @@ public class TruffulaPrinterTest {
         expected.append("   B.txt").append(nl);
         expected.append("   sub/").append(nl);
 
-        // Check that all expected lines are present in the output
-        // String[] expectedLines = expected.toString().split(nl);
-        // for (String line : expectedLines) {
-        //     if (!line.isEmpty()) {
-        //         assertTrue(output.contains(line), "Should contain: '" + line + "'");
-        //     }
-        // }
         String cleanOutput = output.replaceAll("\\u001B\\[[;\\d]*m", "");
         assertEquals(expected.toString(), cleanOutput);
     }
+
+    @Test
+    public void testPrintTree_HiddenFilesRespected_Simple(@TempDir File tempDir) throws IOException {
+        // Create directory structure: myFolder/ with one visible and one hidden file
+        File myFolder = new File(tempDir, "myFolder");
+        assertTrue(myFolder.mkdir(), "myFolder should be created");
+
+        File visible = new File(myFolder, "visible.txt");
+        visible.createNewFile();
+        createHiddenFile(myFolder, ".hidden.txt");
+
+        String nl = System.lineSeparator();
+
+        // Test with showHidden = false
+        TruffulaOptions optionsNoHidden = new TruffulaOptions(myFolder, false, false);
+        ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+        PrintStream ps1 = new PrintStream(baos1);
+        TruffulaPrinter printer1 = new TruffulaPrinter(optionsNoHidden, ps1);
+        printer1.printTree();
+        String output1 = baos1.toString();
+
+        StringBuilder expected1 = new StringBuilder();
+        expected1.append("myFolder/").append(nl);
+        expected1.append("   visible.txt").append(nl);
+
+        //Works if this hidden files are not showns
+        String cleanOutput1 = output1.replaceAll("\\u001B\\[[;\\d]*m", "");
+        assertEquals(expected1.toString(), cleanOutput1);
+
+        // Test with showHidden = true
+        TruffulaOptions optionsWithHidden = new TruffulaOptions(myFolder, true, false);
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        PrintStream ps2 = new PrintStream(baos2);
+        TruffulaPrinter printer2 = new TruffulaPrinter(optionsWithHidden, ps2);
+        printer2.printTree();
+        String output2 = baos2.toString();
+
+        StringBuilder expected2 = new StringBuilder();
+        expected2.append("myFolder/").append(nl);
+        expected2.append("   .hidden.txt").append(nl);
+        expected2.append("   visible.txt").append(nl);
+
+        //Works if this hidden files are showns
+        String cleanOutput2 = output2.replaceAll("\\u001B\\[[;\\d]*m", "");
+        assertEquals(expected2.toString(), cleanOutput2);
+        
+    }
+
+    @Test
+    public void testPrintTree_HiddenFilesRespected_LargerTree(@TempDir File tempDir) throws IOException {
+        // Create directory structure: myFolder/ with one visible and one hidden file
+        File myFolder = new File(tempDir, "myFolder");
+        assertTrue(myFolder.mkdir(), "myFolder should be created");
+
+        // Create visible files in myFolder
+        File apple = new File(myFolder, "Apple.txt");
+        File banana = new File(myFolder, "banana.txt");
+        File zebra = new File(myFolder, "zebra.txt");
+        apple.createNewFile();
+        banana.createNewFile();
+        zebra.createNewFile();
+
+        // Create a hidden file in myFolder
+        createHiddenFile(myFolder, ".hidden.txt");
+
+        // Create subdirectory "Documents" in myFolder
+        File documents = new File(myFolder, "Documents");
+        assertTrue(documents.mkdir(), "Documents directory should be created");
+
+        // Create files in Documents
+        File readme = new File(documents, "README.md");
+        File notes = new File(documents, "notes.txt");
+        readme.createNewFile();
+        notes.createNewFile();
+
+        // Create subdirectory "images" in Documents
+        File images = new File(documents, "images");
+        assertTrue(images.mkdir(), "images directory should be created");
+
+        // Create files in images
+        File cat = new File(images, "cat.png");
+        File dog = new File(images, "Dog.png");
+        cat.createNewFile();
+        dog.createNewFile();
+
+        String nl = System.lineSeparator();
+
+        // Test with showHidden = false
+        TruffulaOptions optionsNoHidden = new TruffulaOptions(myFolder, false, false);
+        ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+        PrintStream ps1 = new PrintStream(baos1);
+        TruffulaPrinter printer1 = new TruffulaPrinter(optionsNoHidden, ps1);
+        printer1.printTree();
+        String output1 = baos1.toString();
+
+        // EX:
+        // StringBuilder expected1 = new StringBuilder();
+        // expected1.append("myFolder/").append(nl);
+        // expected1.append("   visible.txt").append(nl);
+        StringBuilder expected1 = new StringBuilder();
+        expected1.append("myFolder/").append(nl);
+        expected1.append("   Apple.txt").append(nl);
+        expected1.append("   banana.txt").append(nl);
+        expected1.append("   Documents/").append(nl);
+        expected1.append("      images/").append(nl);
+        expected1.append("         cat.png").append(nl);
+        expected1.append("         Dog.png").append(nl);
+        expected1.append("      notes.txt").append(nl);
+        expected1.append("      README.md").append(nl);
+        expected1.append("   zebra.txt").append(nl);
+
+        //Works if this hidden files are not showns
+        String cleanOutput1 = output1.replaceAll("\\u001B\\[[;\\d]*m", "");
+        assertEquals(expected1.toString(), cleanOutput1);
+
+        // Test with showHidden = true
+        TruffulaOptions optionsWithHidden = new TruffulaOptions(myFolder, true, false);
+        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+        PrintStream ps2 = new PrintStream(baos2);
+        TruffulaPrinter printer2 = new TruffulaPrinter(optionsWithHidden, ps2);
+        printer2.printTree();
+        String output2 = baos2.toString();
+
+        // EX:
+        // StringBuilder expected2 = new StringBuilder();
+        // expected2.append("myFolder/").append(nl);
+        // expected2.append("   .hidden.txt").append(nl);
+        // expected2.append("   visible.txt").append(nl);
+        StringBuilder expected2 = new StringBuilder();
+        expected2.append("myFolder/").append(nl);
+        expected2.append("   .hidden.txt").append(nl);
+        expected2.append("   Apple.txt").append(nl);
+        expected2.append("   banana.txt").append(nl);
+        expected2.append("   Documents/").append(nl);
+        expected2.append("      images/").append(nl);
+        expected2.append("         cat.png").append(nl);
+        expected2.append("         Dog.png").append(nl);
+        expected2.append("      notes.txt").append(nl);
+        expected2.append("      README.md").append(nl);
+        expected2.append("   zebra.txt").append(nl);
+
+        //Works if this hidden files are showns
+        String cleanOutput2 = output2.replaceAll("\\u001B\\[[;\\d]*m", "");
+        assertEquals(expected2.toString(), cleanOutput2);
+        
+    }
+    
 }

@@ -116,6 +116,7 @@ public class TruffulaPrinter {
   }
 
   private void printHelper(java.io.File root, int level) {
+    // Start: java src/App.java -nc -h src
     
     String indent = "   ";
     //Grabs the last part of the path. for Ex: new File("C:/foo/bar.txt"), getName() returns "bar.txt" 

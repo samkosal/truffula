@@ -1,5 +1,6 @@
 import java.io.PrintStream;
 import java.util.List;
+import java.io.File;
 
 /**
  * TruffulaPrinter is responsible for printing a directory tree structure
@@ -115,7 +116,7 @@ public class TruffulaPrinter {
     // }
   }
 
-  private void printHelper(java.io.File root, int level) {
+  private void printHelper(File root, int level) {
     // Start: java src/App.java -nc -h src
     if (root.isHidden() && !options.isShowHidden()) {
       return;
@@ -144,12 +145,17 @@ public class TruffulaPrinter {
       // print out the root directory in this format:
       out.println(indent.repeat(level) + name + "/");
       //.listFiles() returns an array of files inside root, only works on directory, hence why we checked it in the first place.
-      java.io.File[] files = root.listFiles();
+      File[] files = root.listFiles();
+      
+      //create a new AlphabeticalFileSorter class
+      AlphabeticalFileSorter sorter = new AlphabeticalFileSorter();
       
       //if the root directory is NOT empty
       if (files != null) {
+        File[] filesSorted = sorter.sort(files);
         //start looping over each file and recursion
-        for (java.io.File file : files) {
+        // for (File file : files) {
+        for (File file : filesSorted) {
           printHelper(file, level + 1);
         }
       }

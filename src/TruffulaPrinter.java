@@ -121,18 +121,17 @@ public class TruffulaPrinter {
     if (root.isHidden() && !options.isShowHidden()) {
       return;
     }
-    if (level % 3 == 0) {
+    if (options.isUseColor()) {
+      if (level % 3 == 0) {
       out.setCurrentColor(ConsoleColor.WHITE);
+      }
+      if (level % 3 == 1) {
+        out.setCurrentColor(ConsoleColor.PURPLE);
+      }
+      if (level % 3 == 2) {
+        out.setCurrentColor(ConsoleColor.YELLOW);
+      }
     }
-    if (level % 3 == 1) {
-      out.setCurrentColor(ConsoleColor.PURPLE);
-    }
-    if (level % 3 == 2) {
-      out.setCurrentColor(ConsoleColor.YELLOW);
-    }
-    
-    
-    
     String indent = "   ";
     //Grabs the last part of the path. for Ex: new File("C:/foo/bar.txt"), getName() returns "bar.txt" 
     String name = root.getName();
